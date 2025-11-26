@@ -1,0 +1,52 @@
+# FastAPI Framework
+fastapi==0.104.1
+uvicorn[standard]==0.24.0
+
+# Database
+sqlalchemy==2.0.23
+alembic==1.12.1
+psycopg2-binary==2.9.9
+
+# Authentication & Security
+python-jose[cryptography]==3.3.0
+passlib==1.7.4
+python-multipart==0.0.6
+bcrypt==4.0.1
+
+# Environment Variables
+python-dotenv==1.0.0
+
+# Validation
+pydantic==2.5.0
+pydantic-settings==2.1.0
+email-validator==2.1.0
+
+# CORS
+fastapi-cors==0.0.6
+
+# Date & Time
+python-dateutil==2.8.2
+
+# Testing
+pytest==7.4.3
+pytest-asyncio==0.21.1
+httpx==0.25.1
+
+# Code Quality
+black==23.11.0
+flake8==6.1.0
+mypy==1.7.1
+
+# Logging
+loguru==0.7.2
+
+# Redis (for caching)
+redis==5.0.1
+aioredis==2.0.1
+
+# Celery (for background tasks)
+celery==5.3.4
+
+# Additional utilities
+openpyxl==3.1.2
+pandas==2.1.3
