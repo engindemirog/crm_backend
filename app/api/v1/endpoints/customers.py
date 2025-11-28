@@ -31,10 +31,11 @@ async def create_individual_customer(customer_data: IndividualCustomerCreate):
     - **natId**: TC Kimlik Numarası (11 haneli, unique)
     - **fatherName**: Baba adı
     - **birthDate**: Doğum tarihi
+    - **accountManagerId**: Müşteri sorumlusu ID (opsiyonel, dropdown'dan seçilir)
     """
     try:
         customer = individual_customer_service.create_customer(customer_data)
-        return customer
+        return individual_customer_service.get_customer_response(customer)
     except ValueError as e:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -54,7 +55,9 @@ async def get_all_individual_customers():
     customers = individual_customer_service.get_all_customers()
     return {
         "total": len(customers),
-        "customers": customers
+        "customers": [
+            individual_customer_service.get_customer_response(c) for c in customers
+        ]
     }
 
 
@@ -73,7 +76,7 @@ async def get_individual_customer(customer_id: int):
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"Customer with ID {customer_id} not found"
         )
-    return customer
+    return individual_customer_service.get_customer_response(customer)
 
 
 @router.put(
@@ -92,7 +95,7 @@ async def update_individual_customer(customer_id: int, customer_data: Individual
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail=f"Customer with ID {customer_id} not found"
             )
-        return customer
+        return individual_customer_service.get_customer_response(customer)
     except ValueError as e:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,

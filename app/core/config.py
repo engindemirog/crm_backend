@@ -24,7 +24,7 @@ class Settings(BaseSettings):
     REFRESH_TOKEN_EXPIRE_DAYS: int = 7
 
     # CORS Settings
-    ALLOWED_ORIGINS: List[str] = ["http://localhost:3000", "http://localhost:8080"]
+    ALLOWED_ORIGINS: List[str] = ["*"]
     ALLOWED_METHODS: List[str] = ["*"]
     ALLOWED_HEADERS: List[str] = ["*"]
 

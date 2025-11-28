@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.core.config import settings
-from app.api.v1.endpoints import customers
+from app.api.v1.endpoints import customers, account_managers
 
 app = FastAPI(
     title=settings.APP_NAME,
@@ -14,6 +14,7 @@ app = FastAPI(
     ### Özellikler:
     
     * **Bireysel Müşteri Yönetimi**: Bireysel müşterileri ekleyin, listeleyin, güncelleyin ve silin
+    * **Müşteri Sorumlusu Yönetimi**: Account Manager'ları yönetin ve müşterilere atayın
     * **Güvenlik**: Şifre hashleme ve güvenli veri saklama
     * **Validasyon**: Email, TC Kimlik No ve diğer alanlar için otomatik doğrulama
     
@@ -48,6 +49,7 @@ app.add_middleware(
 
 # Include routers
 app.include_router(customers.router)
+app.include_router(account_managers.router)
 
 
 @app.get("/")

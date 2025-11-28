@@ -3,6 +3,12 @@ from typing import Optional
 from pydantic import BaseModel, EmailStr, Field
 
 
+class AccountManagerInfo(BaseModel):
+    """Account Manager bilgisi için nested schema"""
+    id: int
+    fullName: str
+
+
 class IndividualCustomerBase(BaseModel):
     """Bireysel Müşteri Base Schema"""
     firstName: str = Field(..., min_length=2, max_length=50)
@@ -11,6 +17,7 @@ class IndividualCustomerBase(BaseModel):
     natId: str = Field(..., min_length=11, max_length=11, pattern=r'^\d{11}$')
     fatherName: str = Field(..., min_length=2, max_length=50)
     birthDate: datetime
+    accountManagerId: Optional[int] = Field(None, description="Müşteri Sorumlusu ID")
 
 
 class IndividualCustomerCreate(IndividualCustomerBase):
@@ -27,11 +34,13 @@ class IndividualCustomerUpdate(BaseModel):
     fatherName: Optional[str] = Field(None, min_length=2, max_length=50)
     birthDate: Optional[datetime] = None
     password: Optional[str] = Field(None, min_length=6, max_length=100)
+    accountManagerId: Optional[int] = Field(None, description="Müşteri Sorumlusu ID")
 
 
 class IndividualCustomerResponse(IndividualCustomerBase):
     """Bireysel Müşteri Response Schema"""
     id: int
+    accountManager: Optional[AccountManagerInfo] = None
     createdAt: datetime
     updatedAt: datetime
 

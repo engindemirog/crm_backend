@@ -2,6 +2,7 @@ from datetime import datetime
 from typing import List, Optional
 from app.models.customer import IndividualCustomer
 from app.schemas.customer import IndividualCustomerCreate, IndividualCustomerUpdate
+from app.services.account_manager_service import account_manager_service
 from passlib.context import CryptContext
 
 # Password hashing
@@ -30,7 +31,8 @@ class IndividualCustomerService:
                 password="password123",
                 natId="12345678901",
                 fatherName="Mehmet",
-                birthDate=datetime(1990, 5, 15)
+                birthDate=datetime(1990, 5, 15),
+                accountManagerId=1  # Zeynep Aydın
             ),
             IndividualCustomerCreate(
                 firstName="Ayşe",
@@ -39,7 +41,8 @@ class IndividualCustomerService:
                 password="password123",
                 natId="98765432109",
                 fatherName="Ali",
-                birthDate=datetime(1985, 8, 22)
+                birthDate=datetime(1985, 8, 22),
+                accountManagerId=2  # Burak Öztürk
             ),
             IndividualCustomerCreate(
                 firstName="Mehmet",
@@ -48,7 +51,8 @@ class IndividualCustomerService:
                 password="password123",
                 natId="11122233344",
                 fatherName="Hasan",
-                birthDate=datetime(1992, 3, 10)
+                birthDate=datetime(1992, 3, 10),
+                accountManagerId=1  # Zeynep Aydın
             )
         ]
         
@@ -65,6 +69,14 @@ class IndividualCustomerService:
         if self.get_customer_by_nat_id(customer_data.natId):
             raise ValueError(f"National ID already exists: {customer_data.natId}")
         
+        # Account Manager kontrolü
+        if customer_data.accountManagerId:
+            manager = account_manager_service.get_by_id(customer_data.accountManagerId)
+            if not manager:
+                raise ValueError(f"Account Manager with ID {customer_data.accountManagerId} not found")
+            if not manager.isActive:
+                raise ValueError(f"Account Manager with ID {customer_data.accountManagerId} is not active")
+        
         now = datetime.now()
         customer = IndividualCustomer(
             id=self.next_id,
@@ -75,6 +87,7 @@ class IndividualCustomerService:
             natId=customer_data.natId,
             fatherName=customer_data.fatherName,
             birthDate=customer_data.birthDate,
+            accountManagerId=customer_data.accountManagerId,
             createdAt=now,
             updatedAt=now
         )
@@ -127,8 +140,16 @@ class IndividualCustomerService:
             if existing:
                 raise ValueError(f"National ID already exists: {customer_data.natId}")
         
+        # Account Manager güncelleniyorsa kontrol et
+        if customer_data.accountManagerId is not None:
+            manager = account_manager_service.get_by_id(customer_data.accountManagerId)
+            if not manager:
+                raise ValueError(f"Account Manager with ID {customer_data.accountManagerId} not found")
+            if not manager.isActive:
+                raise ValueError(f"Account Manager with ID {customer_data.accountManagerId} is not active")
+        
         # Güncelleme işlemi
-        update_data = customer_data.dict(exclude_unset=True)
+        update_data = customer_data.model_dump(exclude_unset=True)
         for field, value in update_data.items():
             if field == "password":
                 setattr(customer, field, self._hash_password(value))
@@ -147,6 +168,25 @@ class IndividualCustomerService:
         
         self.customers.remove(customer)
         return True
+    
+    def get_customer_response(self, customer: IndividualCustomer) -> dict:
+        """Müşteri response'u account manager bilgisiyle birlikte döner"""
+        response = customer.model_dump()
+        
+        # Account Manager bilgisini ekle
+        if customer.accountManagerId:
+            manager = account_manager_service.get_by_id(customer.accountManagerId)
+            if manager:
+                response["accountManager"] = {
+                    "id": manager.id,
+                    "fullName": f"{manager.firstName} {manager.lastName}"
+                }
+            else:
+                response["accountManager"] = None
+        else:
+            response["accountManager"] = None
+        
+        return response
 
 
 # Singleton instance
